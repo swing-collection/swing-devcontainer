@@ -1,2 +1,1 @@
-# swing-devcontainer
-Swing | .devcontainer
+# Swing | .devContainer
