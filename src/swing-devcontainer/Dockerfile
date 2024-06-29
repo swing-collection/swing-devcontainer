@@ -3,50 +3,30 @@
 
 # Base Image
 # =============================================================================
-FROM ubuntu:22.04
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
 
-# non interactive frontend for locales
-ENV DEBIAN_FRONTEND=noninteractive
+# Set the working directory in the container
+WORKDIR /app
 
-# installing texlive and utils
-RUN \
-    apt-get update && \
-    apt-get -y install \
-        --no-install-recommends \
-        locales \
-        curl \
-        make \
-        git \
-        texlive \
-        texlive-latex-extra \
-        texlive-latex-recommended \
-        texlive-bibtex-extra \
-        texlive-extra-utils \
-        texlive-fonts-extra \
-        pandoc \
-        biber \
-        latexmk \
-        procps \
-        python3-dev \
-        python3-pip \
-        && \
-    rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential
 
-# generating locales
-RUN \
-    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-    dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=en_US.UTF-8
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-ENV \
-    LANGUAGE=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+# Ensure Poetry is in the PATH
+ENV PATH="/root/.local/bin:${PATH}"
 
-# installing cpanm & missing latexindent dependencies
-RUN \
-    curl -L http://cpanmin.us | perl - --self-upgrade && \
-    cpanm Log::Dispatch::File YAML::Tiny File::HomeDir
+# Copy the project's dependencies file to the container
+COPY pyproject.toml poetry.lock* /app/
 
-RUN \
-    pip install pyzotero
+# Install project dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
+
+# Copy the rest of the application
+COPY . /app
