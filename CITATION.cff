@@ -1,8 +1,8 @@
 cff-version: 1.2.0
-title: Scape Foundation - Docker Images - Swing DevContainer
+title: Swing DevContainer
 version: 0.0.1
 date-released: 2024-07-01
-url: "https://github.com/scape-foundation/swing-devcontainer"
+url: "https://github.com/swing-collection/swing-devcontainer"
 message: >-
   If you use this software, please cite it using
   the metadata from this file.
